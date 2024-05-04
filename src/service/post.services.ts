@@ -28,6 +28,44 @@ const getTags = async (database: D1Database) => {
 	}
 };
 
+const getByTag = async (tag: string, database: D1Database) => {
+	try {
+		const prisma = connection(database);
+		return await prisma.post.findMany({
+			include: { PostTags: true },
+			where: { PostTags: { some: { description: tag } } },
+		});
+	} catch (error: any) {
+		throw new Error(`PostService.get error: ${error}`);
+	}
+};
+
+const getCategories = async (database: D1Database) => {
+	try {
+		const prisma = connection(database);
+		const response = await prisma.post.groupBy({
+			by: ['tipe'],
+		});
+		return response.map((category: { tipe: string }) => category.tipe);
+	} catch (error: any) {
+		throw new Error(`PostService.get error: ${error}`);
+	}
+};
+
+const getByCategory = async (category: string, database: D1Database) => {
+	try {
+		const prisma = connection(database);
+		return await prisma.post.findMany({
+			where: {
+				tipe: category,
+			},
+			include: { PostTags: true },
+		});
+	} catch (error: any) {
+		throw new Error(`PostService.get error: ${error}`);
+	}
+};
+
 const post = async (requestData: ICreatePost, database: D1Database) => {
 	try {
 		const prisma = connection(database);
@@ -55,6 +93,9 @@ const deletePost = async (database: D1Database) => {
 export const PostServices = {
 	get,
 	getTags,
+	getByTag,
+	getCategories,
+	getByCategory,
 	post,
 	deletePost,
 };
