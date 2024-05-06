@@ -45,8 +45,14 @@ const getCategories = async (database: D1Database) => {
 		const prisma = connection(database);
 		const response = await prisma.post.groupBy({
 			by: ['tipe'],
+			_count: {
+				_all: true,
+			},
 		});
-		return response.map((category: { tipe: string }) => category.tipe);
+		return response.reduce((acc: { [key: string]: number }, curr) => {
+			acc[curr.tipe] = curr._count._all;
+			return acc;
+		}, {});
 	} catch (error: any) {
 		throw new Error(`PostService.get error: ${error}`);
 	}
