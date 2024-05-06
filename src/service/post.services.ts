@@ -15,6 +15,20 @@ const get = async (database: D1Database) => {
 	}
 };
 
+const getBySlug = async (slug: string, database: D1Database) => {
+	try {
+		const prisma = connection(database);
+		return await prisma.post.findUnique({
+			where: {
+				slug,
+			},
+			include: { PostTags: true },
+		});
+	} catch (error: any) {
+		throw new Error(`PostService.get error: ${error}`);
+	}
+};
+
 const getTags = async (database: D1Database) => {
 	try {
 		const prisma = connection(database);
@@ -98,6 +112,7 @@ const deletePost = async (database: D1Database) => {
 
 export const PostServices = {
 	get,
+	getBySlug,
 	getTags,
 	getByTag,
 	getCategories,

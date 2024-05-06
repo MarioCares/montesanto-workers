@@ -15,6 +15,19 @@ app.get('/', async (c) => {
 	}
 });
 
+app.get('/:slug', async (c) => {
+	try {
+		const post = await PostServices.getBySlug(c.req.param('slug'), c.env.DB);
+		if (post) {
+			return c.json(post);
+		} else {
+			return c.json({ error: 'Publicación no existe' }, 404);
+		}
+	} catch (error: any) {
+		return c.json({ error: error.message }, 500);
+	}
+});
+
 app.get('/tags', async (c) => {
 	try {
 		return c.json(await PostServices.getTags(c.env.DB));
